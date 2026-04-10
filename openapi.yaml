@@ -1,0 +1,529 @@
+openapi: 3.0.3
+info:
+  title: Demo API - Gestor de Tareas
+  version: 1.0.0
+  description: API REST para gestion de usuarios y tareas.
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+tags:
+  - name: Usuarios
+  - name: Tareas
+
+paths:
+  /api/usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Listar todos los usuarios
+      operationId: listarUsuarios
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioRespuesta'
+    post:
+      tags: [Usuarios]
+      summary: Crear usuario
+      operationId: crearUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioPeticion'
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioRespuesta'
+        '400':
+          description: Validacion o rol no valido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '409':
+          description: Correo ya existente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/usuarios/activos:
+    get:
+      tags: [Usuarios]
+      summary: Listar usuarios habilitados
+      operationId: listarUsuariosActivos
+      responses:
+        '200':
+          description: Lista de usuarios habilitados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioRespuesta'
+
+  /api/usuarios/{id}:
+    get:
+      tags: [Usuarios]
+      summary: Obtener usuario por id
+      operationId: obtenerUsuarioPorId
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioRespuesta'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    put:
+      tags: [Usuarios]
+      summary: Actualizar usuario
+      operationId: actualizarUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioPeticion'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioRespuesta'
+        '400':
+          description: Validacion o rol no valido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '409':
+          description: Correo ya existente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    delete:
+      tags: [Usuarios]
+      summary: Eliminar usuario
+      operationId: eliminarUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/usuarios/{id}/habilitar:
+    patch:
+      tags: [Usuarios]
+      summary: Habilitar usuario
+      operationId: habilitarUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Usuario habilitado
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/usuarios/{id}/deshabilitar:
+    patch:
+      tags: [Usuarios]
+      summary: Deshabilitar usuario
+      operationId: deshabilitarUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Usuario deshabilitado
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/tareas:
+    get:
+      tags: [Tareas]
+      summary: Listar tareas (todas o filtradas por completada)
+      operationId: listarTareas
+      parameters:
+        - in: query
+          name: completada
+          required: false
+          schema:
+            type: boolean
+          description: Si se informa, filtra por estado de completado.
+      responses:
+        '200':
+          description: Lista de tareas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TareaRespuesta'
+    post:
+      tags: [Tareas]
+      summary: Crear tarea
+      operationId: crearTarea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TareaPeticion'
+      responses:
+        '201':
+          description: Tarea creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TareaRespuesta'
+        '400':
+          description: Validacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Usuario propietario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/tareas/{id}:
+    get:
+      tags: [Tareas]
+      summary: Obtener tarea por id
+      operationId: obtenerTareaPorId
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Tarea encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TareaRespuesta'
+        '404':
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    put:
+      tags: [Tareas]
+      summary: Actualizar tarea
+      operationId: actualizarTarea
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TareaPeticion'
+      responses:
+        '200':
+          description: Tarea actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TareaRespuesta'
+        '400':
+          description: Validacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Tarea o usuario propietario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    delete:
+      tags: [Tareas]
+      summary: Eliminar tarea
+      operationId: eliminarTarea
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Tarea eliminada
+        '404':
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/tareas/{id}/completar:
+    patch:
+      tags: [Tareas]
+      summary: Marcar tarea como completada
+      operationId: completarTarea
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Tarea completada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TareaRespuesta'
+        '404':
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/tareas/{id}/descompletar:
+    patch:
+      tags: [Tareas]
+      summary: Marcar tarea como no completada
+      operationId: descompletarTarea
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Tarea descompletada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TareaRespuesta'
+        '404':
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/tareas/usuario/{usuarioId}:
+    get:
+      tags: [Tareas]
+      summary: Listar tareas por usuario
+      description: |
+        Filtros soportados:
+        - `completada`
+        - `desde` + `hasta`
+
+        Precedencia actual de la implementacion:
+        1) Si llega `completada`, se ignoran `desde` y `hasta`.
+        2) Si no llega `completada` y llegan `desde` y `hasta`, filtra por rango.
+        3) Si no llega ninguno, devuelve todas del usuario.
+      operationId: listarTareasPorUsuario
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: completada
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: desde
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: hasta
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Lista de tareas del usuario
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TareaRespuesta'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+components:
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+  schemas:
+    UsuarioPeticion:
+      type: object
+      required:
+        - correoElectronico
+        - nombreCompleto
+        - contrasena
+      properties:
+        correoElectronico:
+          type: string
+          format: email
+          maxLength: 120
+        nombreCompleto:
+          type: string
+          maxLength: 120
+        contrasena:
+          type: string
+          minLength: 6
+          maxLength: 255
+        habilitado:
+          type: boolean
+          default: true
+        roles:
+          type: array
+          items:
+            type: string
+            example: USER
+
+    UsuarioRespuesta:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        correoElectronico:
+          type: string
+          format: email
+        nombreCompleto:
+          type: string
+        habilitado:
+          type: boolean
+        ultimoAccesoEn:
+          type: string
+          format: date-time
+          nullable: true
+        creadoEn:
+          type: string
+          format: date-time
+        actualizadoEn:
+          type: string
+          format: date-time
+        roles:
+          type: array
+          items:
+            type: string
+
+    TareaPeticion:
+      type: object
+      required:
+        - titulo
+        - texto
+        - fechaLimite
+        - propietarioId
+      properties:
+        titulo:
+          type: string
+          maxLength: 120
+        texto:
+          type: string
+          maxLength: 2000
+        fechaLimite:
+          type: string
+          format: date
+        propietarioId:
+          type: integer
+          format: int64
+
+    TareaRespuesta:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        titulo:
+          type: string
+        texto:
+          type: string
+        fechaLimite:
+          type: string
+          format: date
+        completada:
+          type: boolean
+        completadaEn:
+          type: string
+          format: date-time
+          nullable: true
+        creadoEn:
+          type: string
+          format: date-time
+        actualizadoEn:
+          type: string
+          format: date-time
+        propietarioId:
+          type: integer
+          format: int64
+        propietarioNombre:
+          type: string
+
+    ProblemDetail:
+      type: object
+      description: Estructura de error estandar de Spring (puede variar segun configuracion).
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+
