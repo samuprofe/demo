@@ -16,4 +16,5 @@ public class UsuarioRespuesta {
     private LocalDateTime creadoEn;
     private LocalDateTime actualizadoEn;
     private Set<String> roles;
+    private boolean tieneFoto;
 }

@@ -71,6 +71,32 @@
   - `204 No Content`
   - `404 Not Found`: usuario no encontrado
 
+### `POST /api/usuarios/{id}/foto`
+- **Descripcion:** sube o actualiza la foto de perfil de un usuario.
+- **Path params:** `id: Long`.
+- **Body:** `multipart/form-data` con campo `foto` (imagen, máx. 5 MB).
+- **Respuestas:**
+  - `204 No Content`
+  - `400 Bad Request`: archivo vacío o no es una imagen
+  - `404 Not Found`: usuario no encontrado
+
+### `GET /api/usuarios/{id}/foto`
+- **Descripcion:** obtiene la foto de perfil de un usuario.
+- **Path params:** `id: Long`.
+- **Body:** no.
+- **Respuestas:**
+  - `200 OK`: bytes de la imagen (`image/*`)
+  - `404 Not Found`: usuario no encontrado o sin foto
+
+## Autenticación
+
+### `POST /api/auth/login`
+- **Descripcion:** verifica las credenciales y devuelve los datos del usuario.
+- **Body:** `LoginPeticion`.
+- **Respuestas:**
+  - `200 OK`: `UsuarioRespuesta`
+  - `401 Unauthorized`: credenciales incorrectas o usuario deshabilitado
+
 ## Tareas
 
 ### `GET /api/tareas`
@@ -168,7 +194,16 @@
   "ultimoAccesoEn": null,
   "creadoEn": "2026-04-10T13:00:00",
   "actualizadoEn": "2026-04-10T13:00:00",
-  "roles": ["USER"]
+  "roles": ["USER"],
+  "tieneFoto": false
+}
+```
+
+### `LoginPeticion`
+```json
+{
+  "correoElectronico": "ana@demo.com",
+  "contrasena": "secreto123"
 }
 ```
 

@@ -8,10 +8,36 @@ servers:
     description: Local
 
 tags:
+  - name: Autenticacion
   - name: Usuarios
   - name: Tareas
 
 paths:
+  /api/auth/login:
+    post:
+      tags: [Autenticacion]
+      summary: Iniciar sesion
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginPeticion'
+      responses:
+        '200':
+          description: Credenciales correctas, devuelve datos del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioRespuesta'
+        '401':
+          description: Credenciales incorrectas o usuario deshabilitado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
   /api/usuarios:
     get:
       tags: [Usuarios]
@@ -173,6 +199,60 @@ paths:
           description: Usuario deshabilitado
         '404':
           description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/usuarios/{id}/foto:
+    post:
+      tags: [Usuarios]
+      summary: Subir o actualizar foto de perfil
+      operationId: subirFotoUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                foto:
+                  type: string
+                  format: binary
+                  description: Imagen de perfil (max 5 MB)
+      responses:
+        '204':
+          description: Foto subida correctamente
+        '400':
+          description: Archivo vacio o no es una imagen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    get:
+      tags: [Usuarios]
+      summary: Obtener foto de perfil
+      operationId: obtenerFotoUsuario
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Bytes de la imagen
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Usuario no encontrado o sin foto
           content:
             application/json:
               schema:
@@ -457,6 +537,21 @@ components:
           type: array
           items:
             type: string
+        tieneFoto:
+          type: boolean
+          description: Indica si el usuario tiene foto de perfil almacenada.
+
+    LoginPeticion:
+      type: object
+      required:
+        - correoElectronico
+        - contrasena
+      properties:
+        correoElectronico:
+          type: string
+          format: email
+        contrasena:
+          type: string
 
     TareaPeticion:
       type: object
