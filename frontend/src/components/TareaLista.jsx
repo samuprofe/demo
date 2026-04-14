@@ -2,11 +2,11 @@ import TareaItem from './TareaItem'
 
 function TareaLista({ tareas, onAlternarCompletada }) {
   if (tareas.length === 0) {
-    return <div>No hay tareas aún</div>
+    return <div className="sin-tareas">No hay tareas aún</div>
   }
 
   return (
-    <div>
+    <div className="tarea-lista">
       <ul>
         {tareas.map((tarea) => (
           <TareaItem
@@ -21,4 +21,3 @@ function TareaLista({ tareas, onAlternarCompletada }) {
 }
 
 export default TareaLista
-

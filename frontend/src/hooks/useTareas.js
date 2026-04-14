@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react'
-import { fetchTareas, actualizarEstadoTarea } from '../services/api'
+import { useState, useEffect, useCallback } from 'react'
+import { fetchTareasUsuario, actualizarEstadoTarea } from '../services/api'
 
-export const useTareas = () => {
+export const useTareas = (usuarioId) => {
   const [tareas, setTareas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    cargarTareas()
-  }, [])
-
-  const cargarTareas = async () => {
+  const cargarTareas = useCallback(async () => {
+    if (!usuarioId) {
+      setTareas([])
+      setCargando(false)
+      return
+    }
     try {
       setCargando(true)
       setError(null)
-      const datos = await fetchTareas()
+      const datos = await fetchTareasUsuario(usuarioId)
       setTareas(datos)
     } catch (err) {
       setError(err.message)
@@ -22,7 +23,11 @@ export const useTareas = () => {
     } finally {
       setCargando(false)
     }
-  }
+  }, [usuarioId])
+
+  useEffect(() => {
+    cargarTareas()
+  }, [cargarTareas])
 
   const actualizarTarea = async (id, completada) => {
     try {
@@ -47,4 +52,3 @@ export const useTareas = () => {
 }
 
 export default useTareas
-
